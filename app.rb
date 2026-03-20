@@ -1,6 +1,8 @@
-# myapp.rb
+# frozen_string_literal: true
+
 require 'sinatra'
+require 'faker'
 
 get '/' do
-  'Hello world!'
+  'hola'
 end

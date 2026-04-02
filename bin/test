@@ -1,0 +1,2 @@
+#!/bin/bash
+RACK_ENV=test ruby test/health_test.rb

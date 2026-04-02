@@ -11,3 +11,7 @@ group :development do
   gem 'rerun'
   gem 'rubocop'
 end
+
+group :test do
+  gem 'rack-test'
+end

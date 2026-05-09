@@ -18,4 +18,19 @@ class RootTest < Minitest::Test
     assert last_response.body.include?('Creature')
     assert last_response.body.include?('Currency')
   end
+
+  def test_gets_contant_method_ok
+    get '/?constant=Currency'
+    # mock Faker::Currency.name to return whatever
+    assert last_response.ok?
+    assert last_response.body.include?
+  end
+
+  # i need to also test for nested modules i.e. Faker::Creature::Animal.methods
+
+  def test_gets_contant_method_bad_request
+    get '/?constant=INVALID'
+
+    assert last_response.bad_request?
+  end
 end

@@ -4,7 +4,7 @@ require 'sinatra'
 require 'faker'
 
 get '/' do
-  'hola'
+  Faker.constants.to_s
 end
 
 get '/health' do

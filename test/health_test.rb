@@ -20,8 +20,6 @@ end
 
 # http layer
 
-# expects root to return all faker constants
-
 # expects - query param that
 # returns faker methods on Faker::Class
 

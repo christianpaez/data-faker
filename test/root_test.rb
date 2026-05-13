@@ -19,25 +19,35 @@ class RootTest < Minitest::Test
     assert last_response.body.include?('Currency')
   end
 
-  def test_gets_contant_method_ok
-    get '/?constant=Currency'
+  def test_gets_constant_method_ok
     Faker::Currency.stub(:methods, %i[test_code test_name]) do
-      get '/?constant=Currency'
+      get '/?resource=Currency'
 
-      puts last_response.body
       assert last_response.ok?
       assert last_response.body.include?('test_code')
       assert last_response.body.include?('test_name')
     end
   end
 
-  # needs test for method execution itself i.e. Faker::Currency.code -> "USD"
+  def test_calls_constant_provided_method
+    Faker::Currency.stub(:code, 'USD') do
+      get '/?resource=Currency&field=code'
 
+      assert last_response.ok?
+      assert last_response.body.include?('USD')
+    end
+  end
+
+  def test_calls_constant_provided_method_bad_request
+    get '/?resource=Currency&field=INVALID'
+    assert last_response.bad_request?
+    assert last_response.body.include?('Invalid method name')
+  end
   # also test for modules namespaced outside of default
   # i need to also test for nested modules i.e. Faker::Creature::Animal.methods
 
-  def test_gets_contant_method_bad_request
-    get '/?constant=INVALID'
+  def test_gets_constant_method_bad_request
+    get '/?resource=INVALID'
 
     assert last_response.body.include?('Invalid constant')
     assert last_response.bad_request?

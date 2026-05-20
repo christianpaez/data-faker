@@ -17,26 +17,3 @@ class HealthTest < Minitest::Test
     assert_equal 'ok', last_response.body
   end
 end
-
-# http layer
-
-# expects - query param that
-# returns faker methods on Faker::Class
-
-# expects to invoke the faker constant
-# actual method
-
-# expects to perform the test above given multiple
-# results(dunno how faker does this)
-
-# Application code layer
-
-# expects a method to return all faker constants
-#
-# another method that returns methods given some constant
-#
-# expects to correctly invoke method given constant
-# and said method
-#
-# supports multiple retuns aka list of
-# data

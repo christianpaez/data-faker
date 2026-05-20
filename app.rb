@@ -10,16 +10,16 @@ get '/' do
   resource = params['resource']
   field = params['field']
 
-  if resource && field
-    call_faker_method(resource, field)
-  elsif resource
-    list_faker_methods(resource)
-  else
-    Faker.constants.sort.to_s
-  end
+  @methods ||= list_faker_methods(resource)
+  @constants ||= Faker.constants.sort
+  @result ||= call_faker_method(resource, field)
+
+  erb :index
 end
 
 def call_faker_method(resource, field)
+  return unless resource && field
+
   unless Faker.const_defined?(resource)
     status 400
     return 'Invalid constant'
@@ -36,6 +36,8 @@ def call_faker_method(resource, field)
 end
 
 def list_faker_methods(resource)
+  return unless resource
+
   Faker.const_get(resource).methods(false).map { |m| "#{m} " }.sort
 rescue NameError
   status 400

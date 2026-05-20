@@ -12,6 +12,7 @@ class RootTest < Minitest::Test
     Sinatra::Application
   end
 
+  # TODO: need test that removes :VERSION and such from constants
   def test_root_endpoint
     get '/'
     assert last_response.ok?

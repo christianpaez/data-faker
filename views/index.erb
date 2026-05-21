@@ -1,15 +1,30 @@
 
 
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+   
+
+
+    <div>errors</div>
+
+
+  <% if @error %>
+    <div class="mt-6">
+      <%= @error %>
+      </div>
+<% end %>
+
+    <div>resources</div>
     <% @constants.each do |constant| %>
-      <a class="border-2 border-black bg-white px-5 py-3 mb-3 font-semibold text-black shadow-[4px_4px_0_0] shadow-black hover:bg-yellow-200 focus:ring-2 focus:ring-yellow-300 focus:outline-0" href="/?resource=<%= constant %>">  
+      <a class="border-2 border-black bg-white mb-3 font-semibold text-black shadow-[4px_4px_0_0] shadow-black hover:bg-yellow-200 focus:ring-2 focus:ring-yellow-300 focus:outline-0" href="/?resource=<%= constant %>">  
       <%= constant %>
     </a>
 
   <% end %>
 
 
-  METHODS
+  <div class="mb-3">
+    fields
+    </div>
 
 
 <% @methods&.each do |method| %>
@@ -17,18 +32,26 @@
     current_resource = params[:resource]
     href = current_resource ? "/?resource=#{current_resource}&field=#{method}" : "/?field=#{method}"
   %>
-  <a class="border-2 border-black bg-white px-5 py-3 mb-3 font-semibold text-black shadow-[4px_4px_0_0] shadow-black hover:bg-yellow-200 focus:ring-2 focus:ring-yellow-300 focus:outline-0" 
+  <a class="border-2 border-black bg-white  mb-3 font-semibold text-black shadow-[4px_4px_0_0] shadow-black hover:bg-yellow-200 focus:ring-2 focus:ring-yellow-300 focus:outline-0" 
      href="<%= href %>">  
     <%= method %>
   </a>
 <% end %>
 
 
-result
+<div class="my-4">
+  result
+  </div>
 
-# we need this guy to handle lists too.
-  <% if @result %>
+  <% if @result.is_a? String %>
     <div class="mt-6">
       <%= @result %>
       </div>
+<% end %>
+  <% if @result.is_a? Array %>
+    <% @result.each do |element|%>
+    <div class="mt-6">
+      <%= element %>
+    </div>
+  <% end %>
 <% end %>

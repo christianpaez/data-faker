@@ -27,7 +27,17 @@ class RootTest < Minitest::Test
       assert last_response.ok?
       assert last_response.body.include?('test_code')
       assert last_response.body.include?('test_name')
+      assert !last_response.body.include?('VERSION')
     end
+  end
+
+  # need to test for subconstants - Faker::Animal click produces subconstants such as
+  # Bird, Animal and those have their own methods.
+  # i.e. a new list of subconstants needs to be added.
+  # TODO check that there are no more than 2 levels of nested constants or this wont work
+
+  def test_calls_constant_submodules_ok
+    assert false
   end
 
   def test_calls_constant_provided_method
@@ -41,16 +51,12 @@ class RootTest < Minitest::Test
 
   def test_calls_constant_provided_method_bad_request
     get '/?resource=Currency&field=INVALID'
-    assert last_response.bad_request?
     assert last_response.body.include?('Invalid method name')
   end
-  # also test for modules namespaced outside of default
-  # i need to also test for nested modules i.e. Faker::Creature::Animal.methods
 
   def test_gets_constant_method_bad_request
     get '/?resource=INVALID'
 
     assert last_response.body.include?('Invalid constant')
-    assert last_response.bad_request?
   end
 end

@@ -6,31 +6,29 @@ require 'faker'
 get '/health' do
   'ok'
 end
+
 get '/' do
   resource = params['resource']
   field = params['field']
 
-  @methods ||= list_faker_methods(resource)
-  @constants ||= Faker.constants.sort
-  @result ||= call_faker_method(resource, field)
+  @constants = valid_faker_constants
+  @methods = list_faker_methods(resource)
+  @result = call_faker_method(resource, field)
 
+  erb :index
+rescue StandardError => e
+  @error = e.message
   erb :index
 end
 
 def call_faker_method(resource, field)
   return unless resource && field
 
-  unless Faker.const_defined?(resource)
-    status 400
-    return 'Invalid constant'
-  end
+  raise "Invalid constant: #{resource}" unless Faker.const_defined?(resource)
 
   const = Faker.const_get(resource)
 
-  unless const.respond_to?(field.to_sym)
-    status 400
-    return 'Invalid method name'
-  end
+  raise "Invalid method name: #{field}" unless const.respond_to?(field.to_sym)
 
   const.send(field)
 end
@@ -40,6 +38,12 @@ def list_faker_methods(resource)
 
   Faker.const_get(resource).methods(false).map { |m| "#{m} " }.sort
 rescue NameError
-  status 400
-  'Invalid constant'
+  raise "Invalid constant: #{resource}"
+end
+
+def valid_faker_constants
+  Faker.constants.select do |const|
+    obj = Faker.const_get(const)
+    obj.is_a?(Module)
+  end.sort
 end

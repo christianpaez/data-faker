@@ -3,6 +3,8 @@
 require 'sinatra'
 require 'faker'
 
+# TODO: add erb precompile rule
+
 get '/health' do
   'ok'
 end

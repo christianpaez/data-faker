@@ -12,7 +12,6 @@ class RootTest < Minitest::Test
     Sinatra::Application
   end
 
-  # TODO: need test that removes :VERSION and such from constants
   def test_root_endpoint
     get '/'
     assert last_response.ok?
@@ -20,24 +19,34 @@ class RootTest < Minitest::Test
     assert last_response.body.include?('Currency')
   end
 
-  def test_gets_constant_method_ok
-    Faker::Currency.stub(:methods, %i[test_code test_name]) do
+  def test_gets_constant_methods_ok
+    fake_methods = %i[test_code test_name]
+    Faker::Currency.stub(:methods, fake_methods) do
       get '/?resource=Currency'
 
       assert last_response.ok?
-      assert last_response.body.include?('test_code')
-      assert last_response.body.include?('test_name')
-      assert !last_response.body.include?('VERSION')
+      body = last_response.body
+      assert body.include?('test_code')
+      assert body.include?('test_name')
+      assert !body.include?('VERSION')
     end
   end
 
-  # need to test for subconstants - Faker::Animal click produces subconstants such as
-  # Bird, Animal and those have their own methods.
-  # i.e. a new list of subconstants needs to be added.
-  # TODO check that there are no more than 2 levels of nested constants or this wont work
+  def test_gets_constant_methods_supporting_sub_constants_ok
+    # TODO: we need to make sure that resource can be a subconstant such as Creature::Animal
+    # and displays methods.
+    assert false
+  end
 
   def test_calls_constant_submodules_ok
-    assert false
+    Faker::Creature.stub(:constants, %w[Subconstant1 Subconstant2 Subconstant3]) do
+      get '/?resource=Creature'
+
+      assert last_response.ok?
+      assert last_response.body.include?('Subconstant1')
+      assert last_response.body.include?('Subconstant2')
+      assert last_response.body.include?('Subconstant3')
+    end
   end
 
   def test_calls_constant_provided_method

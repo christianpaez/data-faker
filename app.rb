@@ -14,6 +14,7 @@ get '/' do
   field = params['field']
 
   @constants = valid_faker_constants
+  @sub_constants = valid_faker_constant_sub_constants params[:resource]
   @methods = list_faker_methods(resource)
   @result = call_faker_method(resource, field)
 
@@ -48,4 +49,10 @@ def valid_faker_constants
     obj = Faker.const_get(const)
     obj.is_a?(Module)
   end.sort
+end
+
+def valid_faker_constant_sub_constants(current_constant)
+  raise "Invalid constant: #{current_constant}" unless Faker.const_defined?(current_constant)
+
+  Faker.const_get(current_constant).constants.sort
 end

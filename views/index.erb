@@ -21,6 +21,17 @@
 
   <% end %>
 
+  <div class="mb-3">
+    sub resources
+  </div>
+
+
+    <% @sub_constants&.each do |sub_constant| %>
+      <a class="border-2 border-black bg-white mb-3 font-semibold text-black shadow-[4px_4px_0_0] shadow-black hover:bg-yellow-200 focus:ring-2 focus:ring-yellow-300 focus:outline-0" href="/?resource=<%= sub_constant %>">  
+      <%= sub_constant %>
+    </a>
+
+  <% end %>
 
   <div class="mb-3">
     fields
@@ -37,6 +48,8 @@
     <%= method %>
   </a>
 <% end %>
+
+
 
 
 <div class="my-4">

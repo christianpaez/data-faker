@@ -10,17 +10,17 @@ get '/health' do
 end
 
 get '/' do
-  resource = params['resource']
+  @resource = params['resource']
   field = params['field']
 
   @constants = valid_faker_constants
-  @sub_constants = valid_faker_constant_sub_constants params[:resource]
-  @methods = list_faker_methods(resource)
-  @result = call_faker_method(resource, field)
+  @sub_constants = valid_faker_constant_sub_constants @resource
+  @methods = list_faker_methods(@resource)
+  @result = call_faker_method(@resource, field)
 
   erb :index
 rescue StandardError => e
-  @error = e.message
+  @error = e.message + '' + e.backtrace.first
   erb :index
 end
 
@@ -54,5 +54,8 @@ end
 def valid_faker_constant_sub_constants(current_constant)
   raise "Invalid constant: #{current_constant}" unless Faker.const_defined?(current_constant)
 
-  Faker.const_get(current_constant).constants.sort
+  faker_constant = Faker.const_get(current_constant)
+  return unless faker_constant.is_a? Module
+
+  Faker.const_get(current_constant).constants.select { |c| faker_constant.const_get(c).is_a? Module }.sort
 end

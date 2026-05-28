@@ -57,9 +57,9 @@
   result
   </div>
 
-  <% if @result.is_a? String %>
+  <% if @result.is_a?(String) || @result.is_a?(Time) %>
     <div class="mt-6">
-      <%= @result %>
+      <%= @result.to_s %> hi
       </div>
 <% end %>
   <% if @result.is_a? Array %>

@@ -20,7 +20,8 @@ get '/' do
 
   erb :index
 rescue StandardError => e
-  @error = e.message + '' + e.backtrace.first
+  logger.error e.backtrace
+  @error = e.message
   erb :index
 end
 
@@ -39,7 +40,10 @@ end
 def list_faker_methods(resource)
   return unless resource
 
-  Faker.const_get(resource).methods(false).map { |m| "#{m} " }.sort
+  Faker.const_get(resource).methods(false).select do |method_as_sym|
+    # false if Faker.const_get(resource).method(method_as_sym).parameters.flatten.include?(:keyreq)
+    method_as_sym.to_s
+  end.sort
 rescue NameError
   raise "Invalid constant: #{resource}"
 end
@@ -47,11 +51,12 @@ end
 def valid_faker_constants
   Faker.constants.select do |const|
     obj = Faker.const_get(const)
-    obj.is_a?(Module)
+    obj.is_a?(Module) && obj.constants.any?
   end.sort
 end
 
 def valid_faker_constant_sub_constants(current_constant)
+  return unless current_constant
   raise "Invalid constant: #{current_constant}" unless Faker.const_defined?(current_constant)
 
   faker_constant = Faker.const_get(current_constant)

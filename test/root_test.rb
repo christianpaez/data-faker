@@ -31,7 +31,27 @@ class RootTest < Minitest::Test
       assert body.include?('test_code')
       assert body.include?('test_name')
       assert !body.include?('VERSION')
+      assert !body.include?('InvalidStatePassed')
     end
+  end
+
+  # TODO: need test to filter out constants without
+  # at least one method with no arguments.
+  # example Char
+  #
+  # TODO: same as above but with subconstants
+  #
+  # TODO: same as above but at method level
+  # i.e. remove methods that have required parameters
+  # from response, example Time.between
+
+  def test_gets_constant_methods_without_required_parameters_ok
+    Faker::Time.singleton_class.define_method(:with_keyword_parameter) { |some_parameter:| }
+
+    get '/?resource=Time'
+
+    assert last_response.ok?
+    assert !last_response.body.include?('with_keyword_parameter')
   end
 
   def test_gets_constant_methods_supporting_sub_constants_ok
@@ -55,7 +75,7 @@ class RootTest < Minitest::Test
     assert last_response.ok?
     assert !last_response.body.include?('Letters')
   ensure
-    # I did not find a better
+    # I did not find a better way
     # to do this but whatever
     Faker::Theater.send(:remove_const, :Letters)
   end

@@ -7,6 +7,10 @@ require 'rack/test'
 require 'faker'
 require_relative '../app'
 
+# TODO: Base has errors needing block.
+# TODO: Address as hash method fails.
+# TODO: blockchain aternity rand_strings does not exist.
+
 class RootTest < Minitest::Test
   include Rack::Test::Methods
 

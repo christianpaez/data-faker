@@ -22,48 +22,55 @@ class RootTest < Minitest::Test
   end
 
   def test_gets_constant_methods_ok
-    fake_methods = %i[test_code test_name]
-    Faker::Currency.stub(:methods, fake_methods) do
-      get '/?resource=Currency'
+    Faker::Currency.singleton_class.define_method(:test_code) {}
+    Faker::Currency.singleton_class.define_method(:test_name) {}
+    get '/?resource=Currency'
 
-      assert last_response.ok?
-      body = last_response.body
-      assert body.include?('test_code')
-      assert body.include?('test_name')
-      assert !body.include?('VERSION')
-      assert !body.include?('InvalidStatePassed')
-    end
+    assert last_response.ok?
+    body = last_response.body
+    assert body.include?('test_code')
+    assert body.include?('test_name')
+    assert !body.include?('VERSION')
+    assert !body.include?('InvalidStatePassed')
+  ensure
+    Faker::Currency.singleton_class.remove_method(:test_code)
+    Faker::Currency.singleton_class.remove_method(:test_name)
   end
 
-  # TODO: need test to filter out constants without
-  # at least one method with no arguments.
-  # example Char
-  #
-  # TODO: same as above but with subconstants
-  #
-  # TODO: same as above but at method level
-  # i.e. remove methods that have required parameters
-  # from response, example Time.between
+  def test_gets_constants_without_required_parameters_ok
+    Faker::Char.singleton_class.define_method(:with_keyword_parameter) { |some_parameter:| }
 
-  def test_gets_constant_methods_without_required_parameters_ok
-    Faker::Time.singleton_class.define_method(:with_keyword_parameter) { |some_parameter:| }
-
-    get '/?resource=Time'
+    get '/?resource=Char'
 
     assert last_response.ok?
     assert !last_response.body.include?('with_keyword_parameter')
+  ensure
+    Faker::Char.singleton_class.remove_method(:with_keyword_parameter)
+  end
+
+  def test_gets_subconstant_methods_without_required_parameters_ok
+    Faker::Blockchain::Bitcoin.singleton_class.define_method(:with_required_parameter) { |some_parameter| }
+
+    get '/?resource=Blockchain::Bitcoin'
+
+    assert last_response.ok?
+    assert !last_response.body.include?('with_required_parameter')
+  ensure
+    Faker::Blockchain::Bitcoin.singleton_class.remove_method(:with_required_parameter)
   end
 
   def test_gets_constant_methods_supporting_sub_constants_ok
-    fake_methods = %i[test_code test_name]
-    Faker::Creature::Animal.stub(:methods, fake_methods) do
-      get '/?resource=Creature::Animal'
+    Faker::Creature::Animal.singleton_class.define_method(:test_code) {}
+    Faker::Creature::Animal.singleton_class.define_method(:test_name) {}
+    get '/?resource=Creature::Animal'
 
-      assert last_response.ok?
-      body = last_response.body
-      assert body.include?('test_code')
-      assert body.include?('test_name')
-    end
+    assert last_response.ok?
+    body = last_response.body
+    assert body.include?('test_code')
+    assert body.include?('test_name')
+  ensure
+    Faker::Creature::Animal.singleton_class.remove_method(:test_code)
+    Faker::Creature::Animal.singleton_class.remove_method(:test_name)
   end
 
   def test_gets_only_module_subconstants_ok

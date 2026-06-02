@@ -57,15 +57,15 @@
   result
   </div>
 
-  <% if @result.is_a?(String) || @result.is_a?(Time) %>
-    <div class="mt-6">
-      <%= @result.to_s %> hi
-      </div>
-<% end %>
   <% if @result.is_a? Array %>
     <% @result.each do |element|%>
     <div class="mt-6">
       <%= element %>
     </div>
   <% end %>
+  <% else %>
+
+    <div class="mt-6">
+      <%= @result.to_s %>
+    </div>
 <% end %>

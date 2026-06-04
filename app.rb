@@ -40,10 +40,8 @@ end
 def list_faker_methods(resource)
   return unless resource
 
-  Faker.const_get(resource).public_methods(false).select do |method_as_sym|
-    method_as_sym.to_s unless Faker.const_get(resource).method(method_as_sym).parameters.any? do |p|
-      %i[keyreq req block rest].include?(p.first)
-    end
+  Faker.const_get(resource).singleton_class.public_instance_methods(false).select do |m|
+    Faker.const_get(resource).method(m).parameters.empty?
   end.sort
 rescue NameError
   raise "Invalid constant: #{resource}"

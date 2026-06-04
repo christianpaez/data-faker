@@ -40,9 +40,9 @@ end
 def list_faker_methods(resource)
   return unless resource
 
-  Faker.const_get(resource).methods(false).select do |method_as_sym|
+  Faker.const_get(resource).public_methods(false).select do |method_as_sym|
     method_as_sym.to_s unless Faker.const_get(resource).method(method_as_sym).parameters.any? do |p|
-      %i[keyreq req].include?(p.first)
+      %i[keyreq req block rest].include?(p.first)
     end
   end.sort
 rescue NameError

@@ -7,10 +7,6 @@ require 'rack/test'
 require 'faker'
 require_relative '../app'
 
-# TODO: Base has errors needing block.
-# TODO: Address as hash method fails.
-# TODO: blockchain aternity rand_strings does not exist.
-
 class RootTest < Minitest::Test
   include Rack::Test::Methods
 
@@ -25,9 +21,14 @@ class RootTest < Minitest::Test
     assert last_response.body.include?('Currency')
   end
 
-  def test_gets_constant_methods_ok
+  def test_gets_constant_public_methods_ok
     Faker::Currency.singleton_class.define_method(:test_code) {}
     Faker::Currency.singleton_class.define_method(:test_name) {}
+    Faker::Currency.singleton_class.class_eval do
+      protected
+      define_method(:protected_test_method) {}
+    end
+
     get '/?resource=Currency'
 
     assert last_response.ok?
@@ -36,9 +37,11 @@ class RootTest < Minitest::Test
     assert body.include?('test_name')
     assert !body.include?('VERSION')
     assert !body.include?('InvalidStatePassed')
+    assert !body.include?('protected_test_method')
   ensure
     Faker::Currency.singleton_class.remove_method(:test_code)
     Faker::Currency.singleton_class.remove_method(:test_name)
+    Faker::Currency.singleton_class.remove_method(:protected_test_method)
   end
 
   def test_gets_constants_without_required_parameters_ok
@@ -61,6 +64,28 @@ class RootTest < Minitest::Test
     assert !last_response.body.include?('with_required_parameter')
   ensure
     Faker::Blockchain::Bitcoin.singleton_class.remove_method(:with_required_parameter)
+  end
+
+  def test_gets_constants_without_required_block_ok
+    Faker::Char.singleton_class.define_method(:with_block_parameter) { |&some_block| }
+
+    get '/?resource=Char'
+
+    assert last_response.ok?
+    assert !last_response.body.include?('with_block_parameter')
+  ensure
+    Faker::Char.singleton_class.remove_method(:with_block_parameter)
+  end
+
+  def test_gets_constants_without_rest_parameters_ok
+    Faker::Char.singleton_class.define_method(:with_rest_parameter) { |*some_block| }
+
+    get '/?resource=Char'
+
+    assert last_response.ok?
+    assert !last_response.body.include?('with_rest_parameter')
+  ensure
+    Faker::Char.singleton_class.remove_method(:with_rest_parameter)
   end
 
   def test_gets_constant_methods_supporting_sub_constants_ok

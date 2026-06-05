@@ -152,4 +152,27 @@ class RootTest < Minitest::Test
 
     assert last_response.body.include?('Invalid constant')
   end
+
+  def test_calls_constant_method_with_count_ok
+    codes = %w[code1 code2 code3 code4 code5]
+    Faker::Currency.stub(:code, -> { codes.shift }) do
+      get '/?resource=Currency&field=code&count=5'
+
+      assert last_response.ok?
+      assert last_response.body.include?('code1')
+      assert last_response.body.include?('code2')
+      assert last_response.body.include?('code3')
+      assert last_response.body.include?('code4')
+      assert last_response.body.include?('code5')
+    end
+  end
+
+  def test_calls_constant_method_with_count_bad_request
+    get '/?resource=Currency&field=code&count=INVALID'
+
+    assert last_response.body.include?('Invalid count')
+    get '/?resource=Currency&field=code&count=1001'
+
+    assert last_response.body.include?('Invalid count')
+  end
 end

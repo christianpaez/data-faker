@@ -5,6 +5,10 @@ require 'faker'
 
 # TODO: add erb precompile rule
 
+DEFAULT_RESULT_COUNT = 1
+MAX_RESULT_COUNT = 1000
+MIN_RESULT_COUNT = 1
+
 get '/health' do
   'ok'
 end
@@ -12,12 +16,12 @@ end
 get '/' do
   @resource = params['resource']
   field = params['field']
+  count = params['count'] || DEFAULT_RESULT_COUNT
 
   @constants = valid_faker_constants
   @sub_constants = valid_faker_constant_sub_constants @resource
   @methods = list_faker_methods(@resource)
-  @result = call_faker_method(@resource, field)
-
+  @result = call_faker_method(@resource, field, count.to_i)
   erb :index
 rescue StandardError => e
   logger.error e.backtrace
@@ -25,8 +29,10 @@ rescue StandardError => e
   erb :index
 end
 
-def call_faker_method(resource, field)
+def call_faker_method(resource, field, count)
   return unless resource && field
+
+  raise 'Invalid count' unless count.is_a?(Integer) && count >= MIN_RESULT_COUNT && count <= MAX_RESULT_COUNT
 
   raise "Invalid constant: #{resource}" unless Faker.const_defined?(resource)
 
@@ -34,7 +40,7 @@ def call_faker_method(resource, field)
 
   raise "Invalid method name: #{field}" unless const.respond_to?(field.to_sym)
 
-  const.send(field)
+  count.times.map { const.send(field) }
 end
 
 def list_faker_methods(resource)

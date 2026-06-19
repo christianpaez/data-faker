@@ -52,6 +52,21 @@
 
 
 
+  <div class="my-4">
+  <form method="get" action="/">
+    <% if params[:resource] %>
+      <input type="hidden" name="resource" value="<%= params[:resource] %>">
+    <% end %>
+    <% if params[:field] %>
+      <input type="hidden" name="field" value="<%= params[:field] %>">
+    <% end %>
+    
+    <label for="count">Count:</label>
+    <input type="number" name="count" id="count" value="<%= params[:count] %>" 
+           min="1" class="border-2 border-black px-2 py-1">
+    <input type="submit" value="Set Count" class="border-2 border-black bg-yellow-200 px-3 py-1 ml-2">
+  </form>
+</div>
 
 <div class="my-4">
   result
@@ -69,18 +84,3 @@
       <%= @result.to_s %>
     </div>
   <% end %>
-  <div class="my-4">
-  <form method="get" action="/">
-    <% if params[:resource] %>
-      <input type="hidden" name="resource" value="<%= params[:resource] %>">
-    <% end %>
-    <% if params[:field] %>
-      <input type="hidden" name="field" value="<%= params[:field] %>">
-    <% end %>
-    
-    <label for="count">Count:</label>
-    <input type="number" name="count" id="count" value="<%= params[:count] %>" 
-           min="1" class="border-2 border-black px-2 py-1">
-    <input type="submit" value="Set Count" class="border-2 border-black bg-yellow-200 px-3 py-1 ml-2">
-  </form>
-</div>

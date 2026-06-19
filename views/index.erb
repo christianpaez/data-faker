@@ -15,9 +15,13 @@
 
     <div>resources</div>
     <% @constants.each do |constant| %>
-      <a class="border-2 border-black bg-white mb-3 font-semibold text-black shadow-[4px_4px_0_0] shadow-black hover:bg-yellow-200 focus:ring-2 focus:ring-yellow-300 focus:outline-0" href="/?resource=<%= constant %>">  
-      <%= constant %>
-    </a>
+      <% is_current = (params[:resource] == constant.to_s) %>
+<a class="border-2 border-black bg-white mb-3 font-semibold text-black shadow-[4px_4px_0_0] shadow-black 
+   <%= 'bg-yellow-300 ring-2 ring-yellow-500' if is_current %> 
+   hover:bg-yellow-200 focus:ring-2 focus:ring-yellow-300 focus:outline-0" 
+   href="/?resource=<%= constant %>">  
+  <%= constant %>
+</a>
 
   <% end %>
 
@@ -25,7 +29,12 @@
     sub resources
   </div>
 
-
+<% if params[:resource]&.include?("::") %>
+  <% selected = params[:resource].split("::").last %>
+  <a class="border-2 border-black bg-yellow-300 ring-2 ring-yellow-500 bg-white mb-3 font-semibold text-black shadow-[4px_4px_0_0] shadow-black p-2">
+    <%= selected %>
+  </a>
+<% end %>
   <% @sub_constants&.each do |sub_constant| %>
       <% parent_constant = params[:resource] %>
       <a class="border-2 border-black bg-white mb-3 font-semibold text-black shadow-[4px_4px_0_0] shadow-black hover:bg-yellow-200 focus:ring-2 focus:ring-yellow-300 focus:outline-0" href="/?resource=<%= @resource %>::<%= sub_constant %>">  

@@ -1,67 +1,86 @@
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
+<div>errors</div>
 
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-   
-
-
-    <div>errors</div>
-
-
-  <% if @error %>
-    <div class="mt-6">
-      <%= @error %>
-      </div>
+<% if @error %>
+  <div class="mt-6">
+    <%= @error %>
+  </div>
 <% end %>
 
-    <div>resources</div>
-    <% @constants.each do |constant| %>
-      <% is_current = (params[:resource] == constant.to_s) %>
-<a class="border-2 border-black bg-white mb-3 font-semibold text-black shadow-[4px_4px_0_0] shadow-black 
-   <%= 'bg-yellow-300 ring-2 ring-yellow-500' if is_current %> 
-   hover:bg-yellow-200 focus:ring-2 focus:ring-yellow-300 focus:outline-0" 
-   href="/?resource=<%= constant %>">  
-  <%= constant %>
-</a>
+<div>resources</div>
+<% @constants.each do |constant| %>
+  <% is_current = (params[:resource] == constant.to_s) %>
+  <a
+    class="
+      border-2 border-black bg-white mb-3 font-semibold text-black
+      shadow-[4px_4px_0_0] shadow-black <%= 'bg-yellow-300 ring-2 ring-yellow-500' if is_current %>
+      hover:bg-yellow-200 focus:ring-2 focus:ring-yellow-300 focus:outline-0
+    "
+    href="/?resource=<%= constant %>"
+  >
+    <%= constant %>
+  </a>
 
-  <% end %>
+<% end %>
 
-  <div class="mb-3">
-    sub resources
-  </div>
+<div class="mb-3">
+  sub resources
+</div>
 
 <% if params[:resource]&.include?("::") %>
   <% selected = params[:resource].split("::").last %>
-  <a class="border-2 border-black bg-yellow-300 ring-2 ring-yellow-500 bg-white mb-3 font-semibold text-black shadow-[4px_4px_0_0] shadow-black p-2">
+  <a
+    class="
+      border-2 border-black bg-yellow-300 ring-2 ring-yellow-500 bg-white mb-3
+      font-semibold text-black shadow-[4px_4px_0_0] shadow-black p-2
+    "
+  >
     <%= selected %>
   </a>
 <% end %>
-  <% @sub_constants&.each do |sub_constant| %>
-      <% parent_constant = params[:resource] %>
-      <a class="border-2 border-black bg-white mb-3 font-semibold text-black shadow-[4px_4px_0_0] shadow-black hover:bg-yellow-200 focus:ring-2 focus:ring-yellow-300 focus:outline-0" href="/?resource=<%= @resource %>::<%= sub_constant %>">  
-      <%= sub_constant %>
-    </a>
+<% @sub_constants&.each do |sub_constant| %>
+  <% parent_constant = params[:resource] %>
+  <a
+    class="
+      border-2 border-black bg-white mb-3 font-semibold text-black
+      shadow-[4px_4px_0_0] shadow-black hover:bg-yellow-200 focus:ring-2
+      focus:ring-yellow-300 focus:outline-0
+    "
+    href="/?resource=<%= @resource %>::<%= sub_constant %>"
+  >
+    <%= sub_constant %>
+  </a>
 
-  <% end %>
+<% end %>
 
-  <div class="mb-3">
-    fields
-    </div>
-
+<div class="mb-3">
+  fields
+</div>
 
 <% @methods&.each do |method| %>
-  <% 
-    current_resource = params[:resource]
-    href = current_resource ? "/?resource=#{current_resource}&field=#{method}" : "/?field=#{method}"
-  %>
-  <a class="border-2 border-black bg-white  mb-3 font-semibold text-black shadow-[4px_4px_0_0] shadow-black hover:bg-yellow-200 focus:ring-2 focus:ring-yellow-300 focus:outline-0" 
-     href="<%= href %>">  
+  <% current_resource = params[:resource]
+  href =
+    (
+      if current_resource
+        "/?resource=#{current_resource}&field=#{method}"
+      else
+        "/?field=#{method}"
+      end
+    ) %>
+  <a
+    class="
+      border-2 border-black bg-white mb-3 font-semibold text-black
+      shadow-[4px_4px_0_0] shadow-black hover:bg-yellow-200 focus:ring-2
+      focus:ring-yellow-300 focus:outline-0
+    "
+    href="<%= href %>"
+  >
     <%= method %>
   </a>
 <% end %>
 
-
-
-  <div class="my-4">
+<div class="my-4">
   <form method="get" action="/">
     <% if params[:resource] %>
       <input type="hidden" name="resource" value="<%= params[:resource] %>">
@@ -69,27 +88,37 @@
     <% if params[:field] %>
       <input type="hidden" name="field" value="<%= params[:field] %>">
     <% end %>
-    
+
     <label for="count">Count:</label>
-    <input type="number" name="count" id="count" value="<%= params[:count] %>" 
-           min="1" class="border-2 border-black px-2 py-1">
-    <input type="submit" value="Set Count" class="border-2 border-black bg-yellow-200 px-3 py-1 ml-2">
+    <input
+      type="number"
+      name="count"
+      id="count"
+      value="<%= params[:count] %>"
+      min="1"
+      class="border-2 border-black px-2 py-1"
+    >
+    <input
+      type="submit"
+      value="Set Count"
+      class="border-2 border-black bg-yellow-200 px-3 py-1 ml-2"
+    >
   </form>
 </div>
 
 <div class="my-4">
   result
-  </div>
+</div>
 
-  <% if @result.is_a? Array %>
-    <% @result.each do |element|%>
+<% if @result.is_a? Array %>
+  <% @result.each do |element| %>
     <div class="mt-6">
       <%= element %>
     </div>
   <% end %>
-  <% else %>
+<% else %>
 
-    <div class="mt-6">
-      <%= @result.to_s %>
-    </div>
-  <% end %>
+  <div class="mt-6">
+    <%= @result.to_s %>
+  </div>
+<% end %>

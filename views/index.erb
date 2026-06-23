@@ -1,124 +1,282 @@
 <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
 
-<div>errors</div>
-
-<% if @error %>
-  <div class="mt-6">
-    <%= @error %>
-  </div>
-<% end %>
-
-<div>resources</div>
-<% @constants.each do |constant| %>
-  <% is_current = (params[:resource] == constant.to_s) %>
-  <a
-    class="
-      border-2 border-black bg-white mb-3 font-semibold text-black
-      shadow-[4px_4px_0_0] shadow-black <%= 'bg-yellow-300 ring-2 ring-yellow-500' if is_current %>
-      hover:bg-yellow-200 focus:ring-2 focus:ring-yellow-300 focus:outline-0
-    "
-    href="/?resource=<%= constant %>"
-  >
-    <%= constant %>
-  </a>
-
-<% end %>
-
-<div class="mb-3">
-  sub resources
-</div>
-
-<% if params[:resource]&.include?("::") %>
-  <% selected = params[:resource].split("::").last %>
-  <a
-    class="
-      border-2 border-black bg-yellow-300 ring-2 ring-yellow-500 bg-white mb-3
-      font-semibold text-black shadow-[4px_4px_0_0] shadow-black p-2
-    "
-  >
-    <%= selected %>
-  </a>
-<% end %>
-<% @sub_constants&.each do |sub_constant| %>
-  <% parent_constant = params[:resource] %>
-  <a
-    class="
-      border-2 border-black bg-white mb-3 font-semibold text-black
-      shadow-[4px_4px_0_0] shadow-black hover:bg-yellow-200 focus:ring-2
-      focus:ring-yellow-300 focus:outline-0
-    "
-    href="/?resource=<%= @resource %>::<%= sub_constant %>"
-  >
-    <%= sub_constant %>
-  </a>
-
-<% end %>
-
-<div class="mb-3">
-  fields
-</div>
-
-<% @methods&.each do |method| %>
-  <% current_resource = params[:resource]
-  href =
-    (
-      if current_resource
-        "/?resource=#{current_resource}&field=#{method}"
-      else
-        "/?field=#{method}"
-      end
-    ) %>
-  <a
-    class="
-      border-2 border-black bg-white mb-3 font-semibold text-black
-      shadow-[4px_4px_0_0] shadow-black hover:bg-yellow-200 focus:ring-2
-      focus:ring-yellow-300 focus:outline-0
-    "
-    href="<%= href %>"
-  >
-    <%= method %>
-  </a>
-<% end %>
-
-<div class="my-4">
-  <form method="get" action="/">
-    <% if params[:resource] %>
-      <input type="hidden" name="resource" value="<%= params[:resource] %>">
-    <% end %>
-    <% if params[:field] %>
-      <input type="hidden" name="field" value="<%= params[:field] %>">
-    <% end %>
-
-    <label for="count">Count:</label>
-    <input
-      type="number"
-      name="count"
-      id="count"
-      value="<%= params[:count] %>"
-      min="1"
-      class="border-2 border-black px-2 py-1"
+<div
+  class="
+    max-w-5xl mx-auto px-4 py-8 font-sans bg-gray-900 min-h-screen text-gray-100
+  "
+>
+  <!-- HEADER -->
+  <header class="mb-8 pb-6 border-b border-gray-700">
+    <h1 class="text-3xl font-bold text-white">✨ Faker Studio</h1>
+    <p class="text-gray-400 mt-1 text-sm">Select a category or resource to generate fake data</p>
+  </header>
+  <!-- ERROR -->
+  <% if @error %>
+    <div
+      class="
+        mb-6 p-4 bg-red-900/50 border border-red-700 text-red-200 rounded-lg text-sm
+      "
     >
-    <input
-      type="submit"
-      value="Set Count"
-      class="border-2 border-black bg-yellow-200 px-3 py-1 ml-2"
-    >
-  </form>
-</div>
-
-<div class="my-4">
-  result
-</div>
-
-<% if @result.is_a? Array %>
-  <% @result.each do |element| %>
-    <div class="mt-6">
-      <%= element %>
+      <span class="font-bold">✖ Error:</span>
+      <%= @error %>
     </div>
   <% end %>
-<% else %>
+  <!-- RESOURCES -->
+  <section class="mb-6">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-sm font-semibold text-gray-300 uppercase tracking-wide">Resources</h2>
+      <span
+        class="
+          text-xs text-gray-500 bg-gray-800 px-2 py-0.5 rounded border border-gray-700
+        "
+      ><%= @constants.count %></span>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <% @constants.each do |constant| %>
+        <% is_current = (params[:resource] == constant.to_s) %>
+        <a
+          href="/?resource=<%= constant %>&count=<%= params[:count] || 1 %>#result"
+          class="
+            px-4 py-2 text-sm font-medium rounded-lg border transition-all duration-200
+            <%= is_current ? 'bg-blue-600 text-white border-blue-500 shadow-lg shadow-blue-900/30' : 'bg-gray-800 text-gray-300 border-gray-700 hover:border-blue-500 hover:bg-gray-700 hover:text-white' %>
+          "
+        >
+          <%= constant %>
+        </a>
+      <% end %>
+    </div>
+  </section>
+  <!-- SUB-RESOURCES -->
+  <section class="mb-6">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-sm font-semibold text-gray-300 uppercase tracking-wide">Sub-resources</h2>
+      <span
+        class="
+          text-xs text-gray-500 bg-gray-800 px-2 py-0.5 rounded border border-gray-700
+        "
+      ><%= @sub_constants&.count || 0 %></span>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <% if params[:resource]&.include?("::") %>
+        <% selected = params[:resource].split("::").last %>
+        <span
+          class="
+            px-4 py-2 text-sm font-medium rounded-lg bg-blue-900/30 text-blue-300 border
+            border-blue-700
+          "
+        >
+          <%= selected %>
+        </span>
+      <% end %>
+      <% @sub_constants&.each do |sub_constant| %>
+        <a
+          href="/?resource=<%= @resource %>::<%= sub_constant %>&count=<%= params[:count] || 1 %>#result"
+          class="
+            px-4 py-2 text-sm font-medium rounded-lg bg-gray-800 text-gray-300 border
+            border-gray-700 hover:border-blue-500 hover:bg-gray-700 hover:text-white
+            transition-all duration-200
+          "
+        >
+          <%= sub_constant %>
+        </a>
+      <% end %>
+    </div>
+  </section>
+  <!-- FIELDS -->
+  <section class="mb-6">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-sm font-semibold text-gray-300 uppercase tracking-wide">Fields</h2>
+      <span
+        class="
+          text-xs text-gray-500 bg-gray-800 px-2 py-0.5 rounded border border-gray-700
+        "
+      ><%= @methods&.count || 0 %></span>
+    </div>
+    <div class="flex flex-wrap gap-2">
+      <% @methods&.each do |method| %>
+        <% current_resource = params[:resource] %>
+        <% href =
+          (
+            if current_resource
+              "/?resource=#{current_resource}&field=#{method}&count=#{params[:count] || 1}#result"
+            else
+              "/?field=#{method}&count=#{params[:count] || 1}#result"
+            end
+          ) %>
+        <a
+          href="<%= href %>"
+          class="
+            px-4 py-2 text-sm font-mono rounded-lg bg-gray-800 text-gray-300 border
+            border-gray-700 hover:border-blue-500 hover:bg-gray-700 hover:text-white
+            transition-all duration-200
+          "
+        >
+          <%= method %>
+        </a>
+      <% end %>
+    </div>
+  </section>
+  <!-- COUNT FORM -->
+  <section class="mb-6">
+    <div class="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
+      <form
+        method="get"
+        action="/"
+        class="flex flex-wrap items-center gap-3"
+        id="countForm"
+      >
+        <% if params[:resource] %>
+          <input type="hidden" name="resource" value="<%= params[:resource] %>">
+        <% end %>
+        <% if params[:field] %>
+          <input type="hidden" name="field" value="<%= params[:field] %>">
+        <% end %>
 
-  <div class="mt-6">
-    <%= @result.to_s %>
-  </div>
-<% end %>
+        <label for="count" class="text-sm font-medium text-gray-300">Count</label>
+        <input
+          type="number"
+          name="count"
+          id="count"
+          value="<%= params[:count] || 1 %>"
+          min="1"
+          class="
+            w-20 px-3 py-1.5 bg-gray-900 border border-gray-700 rounded-lg text-center
+            text-sm text-white focus:outline-none focus:ring-2 focus:ring-blue-500
+            focus:border-transparent
+          "
+        >
+        <button
+          type="submit"
+          class="
+            px-5 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg
+            hover:bg-blue-700 transition-all duration-200 hover:shadow-lg
+            hover:shadow-blue-900/30
+          "
+        >
+          ⚡ Generate
+        </button>
+
+        <a
+          href="/"
+          class="
+            px-4 py-1.5 bg-gray-700 text-gray-300 text-sm font-medium rounded-lg
+            hover:bg-gray-600 hover:text-white transition-all duration-200
+          "
+        >
+          ✕ Clear
+        </a>
+      </form>
+    </div>
+  </section>
+  <!-- RESULT -->
+  <section id="result" class="scroll-mt-4">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-sm font-semibold text-gray-300 uppercase tracking-wide">Result</h2>
+      <div class="flex items-center gap-2">
+        <% if @result.is_a?(Array) && @result.any? %>
+          <span
+            class="
+              text-xs text-gray-500 bg-gray-800 px-2 py-0.5 rounded border border-gray-700
+            "
+          ><%= @result.count %>
+            items</span>
+        <% end %>
+        <% if @result && !@result.to_s.empty? && @result.to_s != "No result yet — select a field above" %>
+          <button
+            onclick="copyResult()"
+            class="
+              text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 hover:text-white px-3 py-1
+              rounded border border-gray-700 transition-all duration-200
+            "
+            id="copyBtn"
+          >
+            📋 Copy
+          </button>
+        <% end %>
+      </div>
+    </div>
+    <div
+      class="bg-gray-800/50 p-4 rounded-lg border border-gray-700 min-h-[60px]"
+      id="resultContent"
+    >
+      <% if @result.is_a?(Array) && @result.any? %>
+        <div class="space-y-2">
+          <% @result.each_with_index do |element, index| %>
+            <div
+              class="
+                bg-gray-900/50 p-3 rounded border border-gray-700 font-mono text-sm
+                text-gray-200 hover:border-blue-500 hover:bg-gray-900 transition-all
+                duration-200 flex items-start gap-3
+              "
+            >
+              <span class="text-gray-600 text-xs font-mono select-none"><%= index + 1 %>.</span>
+              <span><%= element %></span>
+            </div>
+          <% end %>
+        </div>
+      <% elsif @result && !@result.to_s.empty? %>
+        <div class="font-mono text-sm text-gray-200"><%= @result.to_s %></div>
+      <% else %>
+        <div class="text-gray-500 text-sm italic">Select a resource and field to generate fake data</div>
+      <% end %>
+    </div>
+  </section>
+
+</div>
+
+<script>
+function copyResult() {
+  const content = document.getElementById('resultContent');
+  if (!content) return;
+  
+  // Get text without the copy button text
+  const text = content.innerText.trim();
+  
+  // Don't copy empty or placeholder text
+  if (!text || text === 'Select a resource and field to generate fake data') {
+    return;
+  }
+  
+  // Try modern clipboard API first
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copyBtn');
+      if (btn) {
+        const original = btn.innerHTML;
+        btn.innerHTML = '✅ Copied!';
+        setTimeout(() => btn.innerHTML = original, 2000);
+      }
+    }).catch(() => {
+      // Fallback to older method
+      fallbackCopy(text);
+    });
+  } else {
+    // Fallback for older browsers
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  // Create temporary textarea
+  const textarea = document.createElement('textarea');
+  textarea.value = text;
+  textarea.style.position = 'fixed';
+  textarea.style.opacity = '0';
+  document.body.appendChild(textarea);
+  textarea.select();
+  
+  try {
+    document.execCommand('copy');
+    const btn = document.getElementById('copyBtn');
+    if (btn) {
+      const original = btn.innerHTML;
+      btn.innerHTML = '✅ Copied!';
+      setTimeout(() => btn.innerHTML = original, 2000);
+    }
+  } catch (err) {
+    // Silent fail
+  }
+  
+  document.body.removeChild(textarea);
+}
+</script>

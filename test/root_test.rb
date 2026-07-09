@@ -55,6 +55,13 @@ class RootTest < Minitest::Test
     Faker::Char.singleton_class.remove_method(:with_keyword_parameter)
   end
 
+  def test_gets_constants_without_any_parameters_ok
+    get '/?resource=Alphanumeric'
+
+    assert last_response.ok?
+    assert !last_response.body.include?('Alphanumeric')
+  end
+  
   def test_gets_subconstant_methods_without_required_parameters_ok
     Faker::Blockchain::Bitcoin.singleton_class.define_method(:with_required_parameter) { |some_parameter| }
 

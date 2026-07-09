@@ -56,7 +56,7 @@ end
 def valid_faker_constants
   Faker.constants.select do |const|
     obj = Faker.const_get(const)
-    obj.is_a?(Module) && obj.constants.any?
+    obj.is_a?(Module) && obj.constants.any? && list_faker_methods(const).any?
   end.sort
 end
 

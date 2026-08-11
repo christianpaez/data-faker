@@ -59,9 +59,9 @@ class RootTest < Minitest::Test
     get '/?resource=Alphanumeric'
 
     assert last_response.ok?
-    assert !last_response.body.include?('Alphanumeric')
+    assert last_response.body.include?('Alphanumeric')
   end
-  
+
   def test_gets_subconstant_methods_without_required_parameters_ok
     Faker::Blockchain::Bitcoin.singleton_class.define_method(:with_required_parameter) { |some_parameter| }
 

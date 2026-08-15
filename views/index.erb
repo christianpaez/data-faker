@@ -1,5 +1,3 @@
-<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-
 <div
   class="
     max-w-5xl mx-auto px-4 py-8 font-sans bg-gray-900 min-h-screen text-gray-100
@@ -47,14 +45,15 @@
     </div>
   </section>
   <!-- SUB-RESOURCES -->
-  <section class="mb-6">
+  <% if @sub_constants&.any? %>
+  <section class="mb-6 anim-on-scroll">
     <div class="flex items-center justify-between mb-3">
       <h2 class="text-sm font-semibold text-gray-300 uppercase tracking-wide">Sub-resources</h2>
       <span
         class="
           text-xs text-gray-500 bg-gray-800 px-2 py-0.5 rounded border border-gray-700
         "
-      ><%= @sub_constants&.count || 0 %></span>
+      ><%= @sub_constants.count %></span>
     </div>
     <div class="flex flex-wrap gap-2">
       <% if params[:resource]&.include?("::") %>
@@ -68,7 +67,7 @@
           <%= selected %>
         </span>
       <% end %>
-      <% @sub_constants&.each do |sub_constant| %>
+      <% @sub_constants.each do |sub_constant| %>
         <a
           href="/?resource=<%= @resource %>::<%= sub_constant %>&count=<%= params[:count] || 1 %>#result"
           class="
@@ -82,8 +81,9 @@
       <% end %>
     </div>
   </section>
+  <% end %>
   <!-- FIELDS -->
-  <section class="mb-6">
+  <section class="mb-6 anim-on-scroll <%= (params[:resource] && !params[:field]) ? 'anim-shake' : '' %>">
     <div class="flex items-center justify-between mb-3">
       <h2 class="text-sm font-semibold text-gray-300 uppercase tracking-wide">Fields</h2>
       <span
@@ -121,7 +121,7 @@
     <div class="bg-gray-800/50 p-4 rounded-lg border border-gray-700">
       <form
         method="get"
-        action="/"
+        action="/#result"
         class="flex flex-wrap items-center gap-3"
         id="countForm"
       >
@@ -147,10 +147,11 @@
         >
         <button
           type="submit"
+          <%= params[:field] ? '' : 'disabled' %>
           class="
             px-5 py-1.5 bg-blue-600 text-white text-sm font-medium rounded-lg
             hover:bg-blue-700 transition-all duration-200 hover:shadow-lg
-            hover:shadow-blue-900/30
+            hover:shadow-blue-900/30 <%= params[:field] ? '' : 'opacity-40 cursor-not-allowed hover:bg-blue-600 hover:shadow-none' %>
           "
         >
           ⚡ Generate
@@ -169,7 +170,7 @@
     </div>
   </section>
   <!-- RESULT -->
-  <section id="result" class="scroll-mt-4">
+  <section id="result" class="scroll-mt-4 anim-on-scroll">
     <div class="flex items-center justify-between mb-3">
       <h2 class="text-sm font-semibold text-gray-300 uppercase tracking-wide">Result</h2>
       <div class="flex items-center gap-2">
@@ -206,7 +207,7 @@
               class="
                 bg-gray-900/50 p-3 rounded border border-gray-700 font-mono text-sm
                 text-gray-200 hover:border-blue-500 hover:bg-gray-900 transition-all
-                duration-200 flex items-start gap-3
+                duration-200 flex items-start gap-3 result-row
               "
             >
               <span class="text-gray-600 text-xs font-mono select-none"><%= index + 1 %>.</span>
@@ -221,62 +222,4 @@
       <% end %>
     </div>
   </section>
-
 </div>
-
-<script>
-function copyResult() {
-  const content = document.getElementById('resultContent');
-  if (!content) return;
-  
-  // Get text without the copy button text
-  const text = content.innerText.trim();
-  
-  // Don't copy empty or placeholder text
-  if (!text || text === 'Select a resource and field to generate fake data') {
-    return;
-  }
-  
-  // Try modern clipboard API first
-  if (navigator.clipboard && navigator.clipboard.writeText) {
-    navigator.clipboard.writeText(text).then(() => {
-      const btn = document.getElementById('copyBtn');
-      if (btn) {
-        const original = btn.innerHTML;
-        btn.innerHTML = '✅ Copied!';
-        setTimeout(() => btn.innerHTML = original, 2000);
-      }
-    }).catch(() => {
-      // Fallback to older method
-      fallbackCopy(text);
-    });
-  } else {
-    // Fallback for older browsers
-    fallbackCopy(text);
-  }
-}
-
-function fallbackCopy(text) {
-  // Create temporary textarea
-  const textarea = document.createElement('textarea');
-  textarea.value = text;
-  textarea.style.position = 'fixed';
-  textarea.style.opacity = '0';
-  document.body.appendChild(textarea);
-  textarea.select();
-  
-  try {
-    document.execCommand('copy');
-    const btn = document.getElementById('copyBtn');
-    if (btn) {
-      const original = btn.innerHTML;
-      btn.innerHTML = '✅ Copied!';
-      setTimeout(() => btn.innerHTML = original, 2000);
-    }
-  } catch (err) {
-    // Silent fail
-  }
-  
-  document.body.removeChild(textarea);
-}
-</script>

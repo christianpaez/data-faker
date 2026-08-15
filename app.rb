@@ -6,7 +6,6 @@ require 'faker'
 # TODO: add erb precompile rule
 # TODO: fix Base module, it has some block parameters that break the app.
 # TODO: ChileRut is also broken, produces 0 and nil values.
-# TODO: autoscroll on generated result, with animation.
 # TODO: subresources are broken
 # TODO: Result with long texts does not wrap, example: sha256
 # TODO: html script is also broken

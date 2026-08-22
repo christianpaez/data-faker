@@ -12,6 +12,12 @@ require 'faker'
 # TODO: Internet: net_checkers do nothing.
 # TODO: UniqueGenerator also provides no value.
 
+set :protection, host_authorization: {
+  allowed_hosts: [
+    '.cloudflare.com'
+  ]
+}
+
 DEFAULT_RESULT_COUNT = 1
 MAX_RESULT_COUNT = 1000
 MIN_RESULT_COUNT = 1
